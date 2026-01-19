@@ -53,3 +53,25 @@ class Controller:
     def handle_get_set_album(self, e):
         """ Handler per gestire il problema ricorsivo di ricerca del set di album """""
         # TODO
+        if not self._selected_album:
+            self._view.show_alert('Selezionare un album.')
+            return
+
+        try:
+            max_duration = float(self._view.txt_durata_totale.value)
+        except ValueError:
+            self._view.show_alert('Inserire un valore numerico valido.')
+            return
+
+        best_set = self._model.max_album_componente_connessa(self._selected_album, max_duration)
+        total_duration = sum(a.duration for a in best_set)
+        self._view.lista_visualizzazione_3.controls.clear()
+        self._view.lista_visualizzazione_3.controls.append(
+            ft.Text(f'Set trovato ({len(best_set)} albums, durata: {total_duration:.2f} minuti)')
+        )
+        for a in best_set:
+            self._view.lista_visualizzazione_3.controls.append(
+                ft.Text(f'- {a.title} ({a.duration:.2f} minuti)')
+            )
+
+        self._view.update()
